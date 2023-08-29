@@ -34,7 +34,6 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "holalegalario.labels" -}}
-helm.sh/chart: {{ include "holalegalario.chart" . }}
 {{ include "holalegalario.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
@@ -46,7 +45,9 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "holalegalario.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "holalegalario.name" . }}
+app.kubernetes.io/name: "holalegalario"
+app.kubernetes.io/app: "holalegalario"
+app: "holalegalario"
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 

@@ -14,12 +14,12 @@ metadata:
             {
               "serviceName":"holalegalario-blue",
               "servicePort":"80",
-              "weight":50
+              "weight":80
             },
             {
               "serviceName":"holalegalario-green",
               "servicePort":"80",
-              "weight":50
+              "weight":20
             }
           ]
         }
@@ -27,6 +27,7 @@ metadata:
   labels:
     app: holalegalario
 spec:
+  ingressClassName: alb
   rules:
     - http:
         paths:
