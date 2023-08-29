@@ -29,6 +29,6 @@ jobs:
       #run: echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
     - name: Push image
-      run: docker push public.ecr.aws.com/q1h1b7r6/nginx:${BUILD_NUMBER}
+      run: docker push public.ecr.aws/q1h1b7r6/nginx:${BUILD_NUMBER}
 
    
