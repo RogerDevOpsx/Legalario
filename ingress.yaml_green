@@ -12,14 +12,9 @@ metadata:
         "forwardConfig":{
           "targetGroups":[
             {
-              "serviceName":"holalegalario-blue",
-              "servicePort":"80",
-              "weight":80
-            },
-            {
               "serviceName":"holalegalario-green",
               "servicePort":"80",
-              "weight":20
+              "weight":100
             }
           ]
         }
