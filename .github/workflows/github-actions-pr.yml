@@ -38,15 +38,15 @@ jobs:
     - name:
       id: build-number
       run: echo "BUILD_NUMBER=${{ needs.build.outputs.build-num }}" >> $GITHUB_ENV
-    - name: Login to Amazon ECR
+    - name: Update deployment
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_USER_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
       id: login-eks
-      run: aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name clustereks
-    - name: Update Deployment
       run: |
+        aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name clustereks
+        kubectl config current-context
         res=$(kubectl describe ingress/holalegalario | grep holalegalario-green)
         if [[ "$res" == *"serviceName"* ]]; then
           helm upgrade holalegalario-blue holalegalario/ --set fullnameOverride="holalegalario-blue" --set nameOverride="holalegalario-blue" --set image.tag=${BUILD_NUMBER} --values holalegalario/values.yaml
