@@ -54,3 +54,4 @@ jobs:
         else
           helm upgrade holalegalario-green holalegalario/ --set fullnameOverride="holalegalario-green" --set nameOverride="holalegalario-green" --set image.tag=${BUILD_NUMBER} --values holalegalario/values.yaml
           kubectl apply -f ingress.yaml_green     
+        fi
