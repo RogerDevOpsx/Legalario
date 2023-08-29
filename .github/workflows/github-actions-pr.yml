@@ -17,7 +17,7 @@ jobs:
       run: echo "BUILD_NUMBER=$(date +'%Y%m%d%H%M%S')-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
 
     - name: Build Docker image
-      run: docker build -t public.ecr.aws/q1h1b7r6/nginx:${BUILD_NUMBER} .
+      run: docker build -t public.ecr.aws/q1h1b7r6/ecrpractica:${BUILD_NUMBER} .
 
     - name: Login to Amazon ECR
       env:
@@ -29,6 +29,6 @@ jobs:
       #run: echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
     - name: Push image
-      run: docker push public.ecr.aws/q1h1b7r6/nginx:${BUILD_NUMBER}
+      run: docker push public.ecr.aws/q1h1b7r6/ecrpractica:${BUILD_NUMBER}
 
    
