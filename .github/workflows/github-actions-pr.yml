@@ -19,15 +19,11 @@ jobs:
     - name: Build Docker image
       run: docker build -t public.ecr.aws/q1h1b7r6/nginx:${BUILD_NUMBER} .
 
-    - name: Set AWS Credentials
-      run: |
-        mkdir -p ~/.aws
-        echo "[default]" > ~/.aws/config
-        echo "region = ${{ secrets.AWS_REGION }}" >> ~/.aws/config
-        echo "access_key = ${{ secrets.AWS_USER_ACCESS_KEY }}" >> ~/.aws/config
-        echo "secret_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/config
-
     - name: Login to Amazon ECR
+      env:
+        AWS_ACCESS_KEY_ID=${{ secrets.AWS_USER_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION=${{ secrets.AWS_REGION }}
       id: login-ecr
       run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/q1h1b7r6
       #run: echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
