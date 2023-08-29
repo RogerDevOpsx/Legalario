@@ -17,7 +17,14 @@ jobs:
       run: echo "BUILD_NUMBER=$(date +'%Y%m%d%H%M%S')-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
 
     - name: Build Docker image
-      run: docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/nginx:${BUILD_NUMBER} .
+      run: docker build -t public.ecr.aws/q1h1b7r6/nginx:${BUILD_NUMBER} .
+
+    - name: Set AWS Credentials
+      run: |
+        echo "[default]" > ~/.aws/config
+        echo "region = ${{ secrets.AWS_REGION }}" >> ~/.aws/config
+        echo "access_key = ${{ secrets.AWS_USER_ACCESS_KEY }}" >> ~/.aws/config
+        echo "secret_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/config
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -25,6 +32,6 @@ jobs:
       #run: echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
     - name: Push image
-      run: docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/nginx:${BUILD_NUMBER}
+      run: docker push public.ecr.aws.com/q1h1b7r6/nginx:${BUILD_NUMBER}
 
    
