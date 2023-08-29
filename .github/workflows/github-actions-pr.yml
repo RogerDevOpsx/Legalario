@@ -7,6 +7,8 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    outputs:
+      build-num: ${{ steps.set-build-var.outputs.build-number }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -26,11 +28,11 @@ jobs:
       run: docker push public.ecr.aws/q1h1b7r6/ecrpractica:${BUILD_NUMBER}
     - name: Set Build variable
       id: set-build-var
-      run: echo "::set-output name=build-number::${BUILD_NUMBER}"
+      run: echo "build-number=${BUILD_NUMBER}" >> $GITHUB_OUTPUT
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
     - name:
       id: build-number
-      run: echo "BUILD_NUMBER=${{ needs.build.outputs.build-number }}" >> $GITHUB_ENV
+      run: echo "BUILD_NUMBER=${{ needs.build.outputs.build-num }}" >> $GITHUB_ENV
