@@ -28,6 +28,7 @@ jobs:
       id: set-build-var
       run: echo "::set-output name=build-number::${BUILD_NUMBER}"
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - name:
