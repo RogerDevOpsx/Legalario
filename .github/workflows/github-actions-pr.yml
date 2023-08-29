@@ -21,6 +21,7 @@ jobs:
 
     - name: Set AWS Credentials
       run: |
+        mkdir -p ~/.aws
         echo "[default]" > ~/.aws/config
         echo "region = ${{ secrets.AWS_REGION }}" >> ~/.aws/config
         echo "access_key = ${{ secrets.AWS_USER_ACCESS_KEY }}" >> ~/.aws/config
