@@ -12,6 +12,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     
+    - name: Set Build Number
+      id: build-number
+      run: echo "BUILD_NUMBER=$(date + '%Y%m%d%H%M%S')-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+
     - name: Build Docker image
       run: docker build -t public.ecr.aws.com/q1h1b7r6/nginx:${BUILD_NUMBER} .
 
