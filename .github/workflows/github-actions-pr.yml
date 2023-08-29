@@ -4,21 +4,17 @@ on:
   push
 
 jobs: 
+
   build:
     runs-on: ubuntu-latest
-
     steps:
-
     - name: Checkout code
       uses: actions/checkout@v2
-    
     - name: Set Build Number
       id: build-number
       run: echo "BUILD_NUMBER=$(date +'%Y%m%d%H%M%S')-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
-
     - name: Build Docker image
       run: docker build -t public.ecr.aws/q1h1b7r6/ecrpractica:${BUILD_NUMBER} .
-
     - name: Login to Amazon ECR
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_USER_ACCESS_KEY }}
@@ -26,9 +22,14 @@ jobs:
         AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
       id: login-ecr
       run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/q1h1b7r6
-      #run: echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login -u AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-
     - name: Push image
       run: docker push public.ecr.aws/q1h1b7r6/ecrpractica:${BUILD_NUMBER}
-
-   
+    - name: Set Build variable
+      id: set-build-var
+      run: echo "::set-output name=build-number::${BUILD_NUMBER}"
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name:
+      id: build-number
+      run: echo "BUILD_NUMBER=${{ needs.build.outputs.build-number }}" >> $GITHUB_ENV
