@@ -13,6 +13,13 @@ jobs:
       uses: actions/checkout@v2
     
     - name: Build Docker image
-      run: docker build -t my-docker-image .
+      run: docker build -t public.ecr.aws.com/q1h1b7r6/nginx:${BUILD_NUMBER} .
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      run: echo ${{ secrets.AWS_SECRET_ACCESS_KEY }} | docker login -u ${{ secrets.AWS_USER_ACCESS_KEY }} --password-stdin public.ecr.aws.com/q1h1b7r6
+
+    - name: Push image
+      run: docker push public.ecr.aws.com/q1h1b7r6/nginx:${BUILD_NUMBER}
 
    
