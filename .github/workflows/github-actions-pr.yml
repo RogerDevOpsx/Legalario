@@ -51,9 +51,11 @@ jobs:
         kubectl config current-context
         res=$(kubectl describe ingress/holalegalario | grep holalegalario-green)
         if [[ "$res" == *"serviceName"* ]]; then
+          echo "Updating blue"
           helm upgrade holalegalario-blue holalegalario/ --set fullnameOverride="holalegalario-blue" --set nameOverride="holalegalario-blue" --set image.tag=${BUILD_NUMBER} --values holalegalario/values.yaml
           kubectl apply -f ingress.yaml_blue
         else
+          echo "Updating green"
           helm upgrade holalegalario-green holalegalario/ --set fullnameOverride="holalegalario-green" --set nameOverride="holalegalario-green" --set image.tag=${BUILD_NUMBER} --values holalegalario/values.yaml
-          kubectl apply -f ingress.yaml_green     
+          kubectl apply -f ingress.yaml_green
         fi
