@@ -52,7 +52,9 @@ jobs:
       run: |
         aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name clustereks
         kubectl config current-context
+        echo "Start validation"
         res=$(kubectl describe ingress/holalegalario | grep holalegalario-green)
+        echo $res
         if [[ "$res" == *"serviceName"* ]]; then
           echo "Updating blue"
           helm upgrade holalegalario-blue holalegalario/ --set fullnameOverride="holalegalario-blue" --set nameOverride="holalegalario-blue" --set image.tag=${BUILD_NUMBER} --values holalegalario/values.yaml
