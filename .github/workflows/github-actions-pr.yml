@@ -55,7 +55,7 @@ jobs:
         echo "Start validation"
         res=$(kubectl describe ingress/holalegalario | grep holalegalario-green)
         echo $res
-        if [[ "$res" == *"serviceName"* ]]; then
+        if [[ $? == 0 && $res ]]; then
           echo "Updating blue"
           helm upgrade holalegalario-blue holalegalario/ --set fullnameOverride="holalegalario-blue" --set nameOverride="holalegalario-blue" --set image.tag=${BUILD_NUMBER} --values holalegalario/values.yaml
           kubectl apply -f ingress.yaml_blue
