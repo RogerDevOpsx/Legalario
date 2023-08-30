@@ -1,6 +1,7 @@
 name: Build, Deploy, and Update EKS Cluster
 
 on:
+  push
   pull_request:
     types:
       - opened
