@@ -1,18 +1,66 @@
 name: Build, Deploy, and Update EKS Cluster
 
 on:
-  push
+  push:
+    branches:
+      - '*'
+  pull_request:
+    types:
+      - opened
 
 jobs: 
+
   build:
     runs-on: ubuntu-latest
-
+    outputs:
+      build-num: ${{ steps.set-build-var.outputs.build-number }}
     steps:
-
     - name: Checkout code
       uses: actions/checkout@v2
-    
+    - name: Set Build Number
+      id: build-number
+      run: echo "BUILD_NUMBER=$(date +'%Y%m%d%H%M%S')-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
     - name: Build Docker image
-      run: docker build -t my-docker-image .
-
-   
+      run: docker build -t public.ecr.aws/q1h1b7r6/ecrpractica:${BUILD_NUMBER} .
+    - name: Login to Amazon ECR
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_USER_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+      id: login-ecr
+      run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/q1h1b7r6
+    - name: Push image
+      run: docker push public.ecr.aws/q1h1b7r6/ecrpractica:${BUILD_NUMBER}
+    - name: Set Build variable
+      id: set-build-var
+      run: echo "build-number=${BUILD_NUMBER}" >> $GITHUB_OUTPUT
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name:
+      id: build-number
+      run: echo "BUILD_NUMBER=${{ needs.build.outputs.build-num }}" >> $GITHUB_ENV
+    - name: Update deployment
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_USER_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+      id: login-eks
+      run: |
+        aws eks update-kubeconfig --region ${AWS_DEFAULT_REGION} --name clustereks
+        kubectl config current-context
+        echo "Start validation"
+        kubectl describe ingress/holalegalario
+        res=$(kubectl describe ingress/holalegalario | grep "serviceName")
+        if [[ "$res" == *"green"* ]]; then
+          echo "Updating blue"
+          helm upgrade holalegalario-blue holalegalario/ --set fullnameOverride="holalegalario-blue" --set nameOverride="holalegalario-blue" --set image.tag=${BUILD_NUMBER} --values holalegalario/values.yaml
+          kubectl apply -f ingress.yaml_blue
+        else
+          echo "Updating green"
+          helm upgrade holalegalario-green holalegalario/ --set fullnameOverride="holalegalario-green" --set nameOverride="holalegalario-green" --set image.tag=${BUILD_NUMBER} --values holalegalario/values.yaml
+          kubectl apply -f ingress.yaml_green
+        fi
